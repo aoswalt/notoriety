@@ -1,37 +1,56 @@
-type tag = string;
-
-type meta = {
-  title: string,
-  tags: array(tag),
-  createdAt: Js.Date.t,
-  modifiedAt: Js.Date.t,
+module Tag = {
+  type t = string;
 };
 
-type note = {
-  meta,
-  text: string,
+module Meta = {
+  type t = {
+    title: string,
+    tags: array(Tag.t),
+    createdAt: Js.Date.t,
+    modifiedAt: Js.Date.t,
+  };
+
+  type incomplete = {
+    title: option(string),
+    tags: option(array(Tag.t)),
+    createdAt: option(Js.Date.t),
+    modifiedAt: option(Js.Date.t),
+  };
 };
 
-type fileName = string;
-
-// type noteFile = {
-//   fileName: fileName,
-//   contents: string
-// }
-
-type noteEntry = {
-  fileName,
-  note,
+module Note = {
+  type t = {
+    meta: Meta.t,
+    text: string,
+  };
 };
 
-module FileNameComparator =
-  Belt.Id.MakeComparable({
-    type t = string;
-    let cmp = compare;
-  });
+module File = {
+  type name = string;
 
-type noteDb = Belt.Map.t(fileName, note, FileNameComparator.identity);
-/* let noteDb = Belt.Map.make(~id=(module FileNameComparator)); */
+  type t = {
+    fileName: name,
+    contents: string,
+  };
+};
+
+module NoteEntry = {
+  type t = {
+    fleName: File.name,
+    note: Note.t,
+  };
+};
+
+module NoteDB = {
+  module Comparator =
+    Belt.Id.MakeComparable({
+      type t = File.name;
+      let cmp = compare;
+    });
+
+  type t = Belt.Map.t(File.name, Note.t, Comparator.identity);
+  /*   let make = Belt.Map.make(~id=(module Comparator)); */
+};
 
 // type tagDb = {
 //   [tag: string]: fileName
