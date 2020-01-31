@@ -22,5 +22,8 @@
   "homepage": "https://github.com/aoswalt/notoriety#readme",
   "devDependencies": {
     "bs-platform": "^7.0.1"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.2"
   }
 }
