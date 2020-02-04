@@ -4,6 +4,8 @@
   */
 module Tag = {
   type t = string;
+
+  let isTag = (tag): bool => Js.typeof(tag) == "string";
 };
 
 module Meta = {
@@ -61,24 +63,28 @@ module NoteDB = {
   /*   let make = Belt.Map.make(~id=(module Comparator)); */
 };
 
-// type tagDb = {
-//   [tag: string]: fileName
-// }
+module TagDB = {
+  module Comparator =
+    Belt.Id.MakeComparable({
+      type t = Tag.t;
+      let cmp = compare;
+    });
 
-Js.log("Hello, BuckleScript and Reason!");
-
-/* [@bs.val] external fetch: string => Js.Promise.t('a) = "fetch"; */
+  type t = Belt.Map.t(Tag.t, File.name, Comparator.identity);
+  /*   let make = Belt.Map.make(~id=(module Comparator)); */
+};
 
 module Parser = {
+  // wrap string in array?
   type metaData = {tags: option(array(string))};
 
-  type parseResult = {
+  type matterResult = {
     content: string,
     data: metaData,
     excerpt: string,
   };
 
-  // built-in excerpt option requires mutability
+  // NOTE(adam): built-in excerpt option requires mutability
   let setExcerpt = result => {
     let excerpt =
       (result.content |> Js.String.split("\n"))
@@ -88,24 +94,58 @@ module Parser = {
     {...result, excerpt};
   };
 
-  [@bs.module] external matter: string => parseResult = "gray-matter";
+  [@bs.module] external matter: string => matterResult = "gray-matter";
 
-  let parse = (raw: string) => raw->matter->setExcerpt;
+  module Tags = {
+    type arr =
+      | Arr(array(string));
 
-  /* let parse = (raw: string): Belt.Result.t(parseResult, string) => */
-  /*   switch (matter(raw)) { */
-  /*   | exception (Js.Exn.Error(err)) => */
-  /*     (err |> Js.Exn.message |> Js.Option.getWithDefault("Some Js Error")) */
-  /*     ->Belt.Result.Error */
-  /*   | parsed => Belt.Result.Ok(parsed) */
-  /*   }; */
+    let handleOption = Js.Option.getWithDefault([||]);
 
-  let toString =
-    fun
-    | Belt.Result.Error(_) => "fail"
-    | Belt.Result.Ok(_) => "ok";
+    /* causes a type unification error */
+    /* let ensureArray = tags => */
+    /*   switch (Js.typeof(tags)) { */
+    /*   | "string" => [|tags|] */
+    /*   | "object" => Js.Array.isArray(tags) ? tags : [||] */
+    /*   | _ => [||] */
+    /*   }; */
+
+    let ensureArray = tags =>
+      switch (Js.typeof(tags)) {
+      | "string" => Arr(tags)
+      | "object" => Js.Array.isArray(tags) ? Arr(tags) : Arr([||])
+      | _ => Arr([||])
+      };
+
+    let unwrapArr = (ar: arr): array(string) =>
+      switch (ar) {
+      | Arr(a) => a
+      };
+
+    let ensureTags = Js.Array.filter(Tag.isTag);
+
+    let parseTags = (result: matterResult): matterResult => {
+      let parsedTags =
+        result.data.tags->handleOption->ensureArray->unwrapArr->ensureTags;
+
+      {
+        ...result,
+        data: {
+          tags: Some(parsedTags),
+        },
+      };
+    };
+  };
+
+  let parse = (raw: string): Belt.Result.t(matterResult, string) =>
+    switch (matter(raw)) {
+    | exception (Js.Exn.Error(err)) =>
+      switch (Js.Exn.message(err)) {
+      | Some(message) => Error(message)
+      | None => Error("Unknown error")
+      }
+    | parsed => parsed->Tags.parseTags->setExcerpt->Ok
+    };
 };
-
-let fn = (n: int): int => n * 2;
 
 Js.log(Parser.parse("---\ntitle: stuff\n---\na subject\nthis is content"));
