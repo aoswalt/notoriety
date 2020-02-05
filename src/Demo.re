@@ -1,10 +1,6 @@
 let (>>) = (f, g, x) => g(f(x));
 let (<<) = (f, g, x) => f(g(x));
 
-/**
-  string -> { meta or incomplete, content }
-  incomplete meta -> fields may be null
-  */
 module Tag = {
   type t = string;
 
@@ -14,27 +10,13 @@ module Tag = {
 module Meta = {
   type t = {
     title: string,
-    tags: array(Tag.t),
-    createdAt: Js.Date.t,
-    modifiedAt: Js.Date.t,
-  };
-
-  type incomplete = {
-    title: option(string),
-    tags: option(array(Tag.t)),
-    createdAt: option(Js.Date.t),
-    modifiedAt: option(Js.Date.t),
+    tags: list(Tag.t),
   };
 };
 
 module Note = {
   type t = {
     meta: Meta.t,
-    text: string,
-  };
-
-  type incomplete = {
-    meta: Meta.incomplete,
     text: string,
   };
 };
@@ -45,13 +27,6 @@ module File = {
   type t = {
     fileName: name,
     contents: string,
-  };
-};
-
-module NoteEntry = {
-  type t = {
-    fleName: File.name,
-    note: Note.t,
   };
 };
 
@@ -90,10 +65,7 @@ module TagsArray = {
     | _ => AnArray([||])
     };
 
-  let unwrapAnArray = (arr: anArray): array(string) =>
-    switch (arr) {
-    | AnArray(a) => a
-    };
+  let unwrapAnArray = (AnArray(arr): anArray): array(string) => arr;
 
   let ensureTagsContent = Js.Array.filter(Tag.isTag);
 
@@ -114,7 +86,8 @@ module Parser = {
   // NOTE(adam): built-in excerpt option requires mutability
   let setExcerpt = result => {
     let excerpt =
-      (result.content |> Js.String.split("\n"))
+      result.content
+      ->Js.String.split("\n", _)
       ->Js.Array.shift
       ->Belt.Option.getWithDefault("");
 
@@ -134,7 +107,7 @@ module Parser = {
     };
   };
 
-  let parse = (raw: string): Belt.Result.t(matterResult, string) =>
+  let parseMatter = (raw: string): Belt.Result.t(matterResult, string) =>
     switch (matter(raw)) {
     | exception (Js.Exn.Error(err)) =>
       switch (Js.Exn.message(err)) {
@@ -143,6 +116,21 @@ module Parser = {
       }
     | parsed => parsed->parseTags->setExcerpt->Ok
     };
+
+  let resultToNote = (result: matterResult): Note.t => {
+    let tagList =
+      result.data.tags->Belt.Option.getWithDefault([||])->Belt.List.fromArray;
+
+    let meta: Meta.t = {title: result.excerpt, tags: tagList};
+
+    {meta, text: result.content};
+  };
+
+  let parse = parseMatter >> Belt.Result.map(_, resultToNote);
 };
 
-Js.log(Parser.parse("---\ntitle: stuff\n---\na subject\nthis is content"));
+Js.log(
+  Parser.parse(
+    "---\ntitle: stuff\ntags: [abc, def]\n---\na subject\nthis is content",
+  ),
+);
