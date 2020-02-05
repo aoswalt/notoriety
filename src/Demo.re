@@ -77,6 +77,30 @@ module TagDB = {
   /*   let make = Belt.Map.make(~id=(module Comparator)); */
 };
 
+module TagsArray = {
+  let handleOption = Js.Option.getWithDefault([||]);
+
+  type anArray =
+    | AnArray(array(string));
+
+  let ensureArray = (tags): anArray =>
+    switch (Js.typeof(tags)) {
+    | "string" => AnArray(tags)
+    | "object" => Js.Array.isArray(tags) ? AnArray(tags) : AnArray([||])
+    | _ => AnArray([||])
+    };
+
+  let unwrapAnArray = (arr: anArray): array(string) =>
+    switch (arr) {
+    | AnArray(a) => a
+    };
+
+  let ensureTagsContent = Js.Array.filter(Tag.isTag);
+
+  let parse =
+    handleOption >> ensureArray >> unwrapAnArray >> ensureTagsContent;
+};
+
 module Parser = {
   // wrap string in array?
   type metaData = {tags: option(array(string))};
@@ -99,44 +123,14 @@ module Parser = {
 
   [@bs.module] external matter: string => matterResult = "gray-matter";
 
-  module Tags = {
-    type arr =
-      | Arr(array(string));
+  let parseTags = (result: matterResult): matterResult => {
+    let parsedTags = TagsArray.parse(result.data.tags);
 
-    let handleOption = Js.Option.getWithDefault([||]);
-
-    /* causes a type unification error */
-    /* let ensureArray = tags => */
-    /*   switch (Js.typeof(tags)) { */
-    /*   | "string" => [|tags|] */
-    /*   | "object" => Js.Array.isArray(tags) ? tags : [||] */
-    /*   | _ => [||] */
-    /*   }; */
-
-    let ensureArray = tags =>
-      switch (Js.typeof(tags)) {
-      | "string" => Arr(tags)
-      | "object" => Js.Array.isArray(tags) ? Arr(tags) : Arr([||])
-      | _ => Arr([||])
-      };
-
-    let unwrapArr = (ar: arr): array(string) =>
-      switch (ar) {
-      | Arr(a) => a
-      };
-
-    let ensureTags = Js.Array.filter(Tag.isTag);
-
-    let parseTags = (result: matterResult): matterResult => {
-      let parsedTags =
-        result.data.tags->handleOption->ensureArray->unwrapArr->ensureTags;
-
-      {
-        ...result,
-        data: {
-          tags: Some(parsedTags),
-        },
-      };
+    {
+      ...result,
+      data: {
+        tags: Some(parsedTags),
+      },
     };
   };
 
@@ -147,7 +141,7 @@ module Parser = {
       | Some(message) => Error(message)
       | None => Error("Unknown error")
       }
-    | parsed => parsed->Tags.parseTags->setExcerpt->Ok
+    | parsed => parsed->parseTags->setExcerpt->Ok
     };
 };
 
