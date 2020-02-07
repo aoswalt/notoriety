@@ -125,9 +125,3 @@ module Parser = {
 
   let parse = handleMatter >> Belt.Result.map(_, resultToNote);
 };
-
-Js.log(
-  Parser.parse(
-    "---\ntitle: stuff\ntags: abc\n---\na subject\nthis is content",
-  ),
-);

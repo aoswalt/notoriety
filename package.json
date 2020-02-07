@@ -5,7 +5,9 @@
   "scripts": {
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
-    "clean": "bsb -clean-world"
+    "clean": "bsb -clean-world",
+    "test": "jest",
+    "test:watch": "npm run test -- --watch"
   },
   "keywords": [
     "BuckleScript"
@@ -21,6 +23,7 @@
   },
   "homepage": "https://github.com/aoswalt/notoriety#readme",
   "devDependencies": {
+    "@glennsl/bs-jest": "^0.4.9",
     "bs-platform": "^7.1.0"
   },
   "dependencies": {
