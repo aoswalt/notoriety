@@ -1,15 +1,14 @@
-let validOneLine = {|First line|};
+let firstLine = "First line";
 
-let validMultiLine = {|First line
+let multiLine = firstLine ++ {|
 Another line
 
 And some more text
 |};
 
-let validFrontMatterWithTags = {|---
+let frontMatterWithTags = {|---
 tags: [abc]
 ---
-First line
 |};
 
 open Jest;
@@ -21,9 +20,34 @@ let extractText =
 
 describe("Parsing without front matter", () => {
   Expect.(
-    test("works with one line", () => {
-      validOneLine->Demo.Parser.parse->extractText->expect
-      |> toEqual("First line")
+    test("gets text with one line", () => {
+      firstLine->Parser.parse->extractText->expect |> toEqual(firstLine)
     })
-  )
+  );
+
+  Expect.(
+    test("gets text with multiple lines", () => {
+      multiLine->Parser.parse->extractText->expect |> toEqual(multiLine)
+    })
+  );
+});
+
+describe("Parsing with front matter", () => {
+  let frontMatterWithSingleLine = frontMatterWithTags ++ firstLine;
+
+  Expect.(
+    test("gets text with one line", () => {
+      frontMatterWithSingleLine->Parser.parse->extractText->expect
+      |> toEqual(firstLine)
+    })
+  );
+
+  let frontMatterWithMultiLine = frontMatterWithTags ++ multiLine;
+
+  Expect.(
+    test("gets text with multiple lines", () => {
+      frontMatterWithMultiLine->Parser.parse->extractText->expect
+      |> toEqual(multiLine)
+    })
+  );
 });
