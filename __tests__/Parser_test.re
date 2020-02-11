@@ -1,3 +1,5 @@
+open Jest;
+
 let firstLine = "First line";
 
 let multiLine = firstLine ++ {|
@@ -11,43 +13,50 @@ tags: [abc]
 ---
 |};
 
-open Jest;
-
-let extractText =
-  fun
-  | Ok({Demo.Note.text}) => text
-  | Error(_) => "error";
-
 describe("Parsing without front matter", () => {
-  Expect.(
-    test("gets text with one line", () => {
-      firstLine->Parser.parse->extractText->expect |> toEqual(firstLine)
-    })
-  );
+  open Expect;
 
-  Expect.(
-    test("gets text with multiple lines", () => {
-      multiLine->Parser.parse->extractText->expect |> toEqual(multiLine)
-    })
-  );
+  test("gets text with one line", () => {
+    firstLine
+    ->Parser.parse
+    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.getWithDefault("error")
+    ->expect
+    |> toEqual(firstLine)
+  });
+
+  test("gets text with multiple lines", () => {
+    multiLine
+    ->Parser.parse
+    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.getWithDefault("error")
+    ->expect
+    |> toEqual(multiLine)
+  });
 });
 
 describe("Parsing with front matter", () => {
+  open Expect;
+
   let frontMatterWithSingleLine = frontMatterWithTags ++ firstLine;
 
-  Expect.(
-    test("gets text with one line", () => {
-      frontMatterWithSingleLine->Parser.parse->extractText->expect
-      |> toEqual(firstLine)
-    })
-  );
+  test("gets text with one line", () => {
+    frontMatterWithSingleLine
+    ->Parser.parse
+    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.getWithDefault("error")
+    ->expect
+    |> toEqual(firstLine)
+  });
 
   let frontMatterWithMultiLine = frontMatterWithTags ++ multiLine;
 
-  Expect.(
-    test("gets text with multiple lines", () => {
-      frontMatterWithMultiLine->Parser.parse->extractText->expect
-      |> toEqual(multiLine)
-    })
-  );
+  test("gets text with multiple lines", () => {
+    frontMatterWithMultiLine
+    ->Parser.parse
+    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.getWithDefault("error")
+    ->expect
+    |> toEqual(multiLine)
+  });
 });

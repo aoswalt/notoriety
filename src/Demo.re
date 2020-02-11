@@ -1,19 +1,37 @@
-module Tag = {
+module Tag: {
+  type t;
+
+  let make: string => t;
+} = {
   type t = string;
+
+  let make = tag => tag;
 };
 
-module Meta = {
+module Note: {
+  type t;
+
+  let make: (~title: string, ~tags: list(Tag.t), ~text: string) => t;
+  let text: t => string;
+} = {
   type t = {
+    meta,
+    text: string,
+  }
+  and meta = {
     title: string,
     tags: list(Tag.t),
   };
-};
 
-module Note = {
-  type t = {
-    meta: Meta.t,
-    text: string,
+  let make = (~title, ~tags, ~text) => {
+    meta: {
+      title,
+      tags,
+    },
+    text,
   };
+
+  let text = note => note.text;
 };
 
 module File = {

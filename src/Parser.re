@@ -1,12 +1,11 @@
 open Ops;
 
-type metaData = {tags: array(string)};
-
 type matterResult = {
   content: string,
   data: metaData,
   excerpt: string,
-};
+}
+and metaData = {tags: array(string)};
 
 // NOTE(adam): built-in excerpt option requires mutability
 let setExcerptFromContent = result => {
@@ -63,11 +62,10 @@ let handleMatter = (raw: string): Belt.Result.t(matterResult, string) =>
   };
 
 let resultToNote = (result: matterResult): Demo.Note.t => {
-  let tagList = Belt.List.fromArray(result.data.tags);
+  let tagList =
+    result.data.tags |> Belt.List.fromArray |> List.map(Demo.Tag.make);
 
-  let meta: Demo.Meta.t = {title: result.excerpt, tags: tagList};
-
-  {meta, text: result.content};
+  Demo.Note.make(~title=result.excerpt, ~tags=tagList, ~text=result.content);
 };
 
 let parse = handleMatter >> Belt.Result.map(_, resultToNote);
