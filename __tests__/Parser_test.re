@@ -19,7 +19,7 @@ describe("Parsing without front matter", () => {
   test("gets text with one line", () => {
     firstLine
     ->Parser.parse
-    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.map(Note.text)
     ->Belt.Result.getWithDefault("error")
     ->expect
     |> toEqual(firstLine)
@@ -28,7 +28,7 @@ describe("Parsing without front matter", () => {
   test("gets text with multiple lines", () => {
     multiLine
     ->Parser.parse
-    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.map(Note.text)
     ->Belt.Result.getWithDefault("error")
     ->expect
     |> toEqual(multiLine)
@@ -43,7 +43,7 @@ describe("Parsing with front matter", () => {
   test("gets text with one line", () => {
     frontMatterWithSingleLine
     ->Parser.parse
-    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.map(Note.text)
     ->Belt.Result.getWithDefault("error")
     ->expect
     |> toEqual(firstLine)
@@ -54,7 +54,7 @@ describe("Parsing with front matter", () => {
   test("gets text with multiple lines", () => {
     frontMatterWithMultiLine
     ->Parser.parse
-    ->Belt.Result.map(Demo.Note.text)
+    ->Belt.Result.map(Note.text)
     ->Belt.Result.getWithDefault("error")
     ->expect
     |> toEqual(multiLine)

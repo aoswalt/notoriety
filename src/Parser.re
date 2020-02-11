@@ -61,11 +61,11 @@ let handleMatter = (raw: string): Belt.Result.t(matterResult, string) =>
   | result => result->setExcerptFromContent->Ok
   };
 
-let resultToNote = (result: matterResult): Demo.Note.t => {
+let resultToNote = (result: matterResult): Note.t => {
   let tagList =
-    result.data.tags |> Belt.List.fromArray |> List.map(Demo.Tag.make);
+    result.data.tags |> Belt.List.fromArray |> List.map(Tag.make);
 
-  Demo.Note.make(~title=result.excerpt, ~tags=tagList, ~text=result.content);
+  Note.make(~title=result.excerpt, ~tags=tagList, ~text=result.content);
 };
 
 let parse = handleMatter >> Belt.Result.map(_, resultToNote);
