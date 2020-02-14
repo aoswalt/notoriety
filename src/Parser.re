@@ -24,7 +24,7 @@ let separateFrontMatter =
   fun
   | lines when !hasFrontMatter(lines) => (None, lines)
   | [first, ...lines] when first == delimiter => {
-      let secondIndex = lines->Array.of_list |> Js.Array.indexOf(delimiter);
+      let secondIndex = lines |> Array.of_list |> Js.Array.indexOf(delimiter);
 
       switch (Belt.List.splitAt(lines, secondIndex)) {
       | Some((fm, [_, ...contents])) => (Some(fm), contents)
@@ -41,6 +41,18 @@ let toString =
 
 let keepNonEmpty = tag => tag != "";
 
+let getTags =
+  fun
+  | `Object(pairs) =>
+    pairs
+    |> List.find_opt(((k, _v)) => k == "tags")
+    |> (
+      fun
+      | Some((_, tags)) => tags
+      | None => `Null
+    )
+  | _ => `Null;
+
 let toTagList =
   fun
   | `Array(tags) => tags |> List.map(toString) |> List.filter(keepNonEmpty)
@@ -52,11 +64,16 @@ let toParseResult = ((fm, lines)) => {
     switch (fm) {
     | None => []
     | Some(fm) =>
-      (fm->Array.of_list |> Js.Array.joinWith("\n"))->Yaml.parse->toTagList
+      fm
+      |> Array.of_list
+      |> Js.Array.joinWith("\n")
+      |> Yaml.parse
+      |> getTags
+      |> toTagList
     };
 
   {
-    body: lines->Array.of_list |> Js.Array.joinWith("\n"),
+    body: lines |> Array.of_list |> Js.Array.joinWith("\n"),
     title: List.hd(lines),
     tags,
   };
