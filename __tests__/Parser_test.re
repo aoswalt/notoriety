@@ -17,19 +17,11 @@ describe("Parsing without front matter", () => {
   open Expect;
 
   test("gets text with one line", () => {
-    firstLine
-    ->Parser.parse
-    ->Note.text
-    ->expect
-    |> toEqual(firstLine)
+    firstLine |> Parser.parse |> Note.text |> expect |> toEqual(firstLine)
   });
 
   test("gets text with multiple lines", () => {
-    multiLine
-    ->Parser.parse
-    ->Note.text
-    ->expect
-    |> toEqual(multiLine)
+    multiLine |> Parser.parse |> Note.text |> expect |> toEqual(multiLine)
   });
 });
 
@@ -40,9 +32,9 @@ describe("Parsing with front matter", () => {
 
   test("gets text with one line", () => {
     frontMatterWithSingleLine
-    ->Parser.parse
-    ->Note.text
-    ->expect
+    |> Parser.parse
+    |> Note.text
+    |> expect
     |> toEqual(firstLine)
   });
 
@@ -50,9 +42,9 @@ describe("Parsing with front matter", () => {
 
   test("gets text with multiple lines", () => {
     frontMatterWithMultiLine
-    ->Parser.parse
-    ->Note.text
-    ->expect
+    |> Parser.parse
+    |> Note.text
+    |> expect
     |> toEqual(multiLine)
   });
 });
