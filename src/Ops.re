@@ -5,3 +5,8 @@ let peek = a => {
   Js.log(a);
   a;
 };
+
+let peek2 = (l, a) => {
+  Js.log2(l, a);
+  a;
+};
