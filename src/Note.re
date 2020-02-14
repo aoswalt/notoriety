@@ -16,3 +16,5 @@ let make = (~title, ~tags, ~text) => {
 };
 
 let text = note => note.text;
+
+let hasTag = (tag, note) => List.mem(tag, note.meta.tags);

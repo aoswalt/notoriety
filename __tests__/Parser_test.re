@@ -47,4 +47,14 @@ describe("Parsing with front matter", () => {
     |> expect
     |> toEqual(multiLine)
   });
+
+  let tag = Tag.make("abc");
+
+  test("has the tag specified", () => {
+    frontMatterWithMultiLine
+    |> Parser.parse
+    |> Note.hasTag(tag)
+    |> expect
+    |> toBe(true)
+  });
 });
