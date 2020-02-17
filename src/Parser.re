@@ -74,7 +74,7 @@ let toParseResult = ((fm, lines)) => {
 
   {
     body: lines |> Array.of_list |> Js.Array.joinWith("\n"),
-    title: List.hd(lines),
+    title: lines |> Belt.List.head |> Belt.Option.getWithDefault(_, ""),
     tags,
   };
 };
