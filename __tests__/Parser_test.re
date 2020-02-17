@@ -13,6 +13,11 @@ tags: [abc]
 ---
 |};
 
+let malformedFrontMatter = {|---
+tags:
+---
+|};
+
 describe("Parsing without front matter", () => {
   open Expect;
 
@@ -57,4 +62,12 @@ describe("Parsing with front matter", () => {
     |> expect
     |> toBe(true)
   });
+
+  test("handles malformed front matter", () => {
+    malformedFrontMatter ++ multiLine
+    |> Parser.parse
+    |> Note.text
+    |> expect
+    |> toBe(multiLine)
+  })
 });
