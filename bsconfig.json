@@ -15,10 +15,9 @@
     "module": "commonjs"
   },
   "suffix": ".bs.js",
-  "bs-dependencies": ["bs-yaml"],
-  "bs-dev-dependencies": [
-    "@glennsl/bs-jest"
-  ],
+  "bs-dependencies": ["bs-log", "bs-yaml"],
+  "bs-dev-dependencies": ["@glennsl/bs-jest"],
+  "ppx-flags": ["bs-log/ppx"],
   "warnings": {
     "error": "+8+101"
   },

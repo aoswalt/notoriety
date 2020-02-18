@@ -4,9 +4,9 @@
   "description": "Simple note management with markdown and tags",
   "scripts": {
     "build": "bsb -make-world",
-    "start": "bsb -make-world -w",
+    "start": "BS_LOG=* BS_LOGGER=NodeLogger bsb -make-world -w",
     "clean": "bsb -clean-world",
-    "test": "jest",
+    "test": "BS_LOG=* BS_LOGGER=NodeLogger jest",
     "test:watch": "npm run test -- --watch"
   },
   "keywords": [
@@ -27,6 +27,7 @@
     "bs-platform": "^7.1.0"
   },
   "dependencies": {
+    "bs-log": "^1.1.0",
     "bs-yaml": "^1.0.2"
   }
 }
