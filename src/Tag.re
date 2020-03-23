@@ -1,10 +1,9 @@
-type t = string;
-type t_ = t;
-
-let make = tag => tag;
-
 module Comparator =
   Belt.Id.MakeComparable({
-    type t = t_;
+    type t = string;
     let cmp = compare;
   });
+
+type t = Comparator.t;
+
+let make: string => t = tag => tag;

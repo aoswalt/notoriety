@@ -7,14 +7,16 @@ and meta = {
   tags: list(Tag.t),
 };
 
-let make = (~title, ~tags, ~text) => {
-  meta: {
-    title,
-    tags,
-  },
-  text,
-};
+let make: (~title: string, ~tags: list(Tag.t), ~text: string) => t =
+  (~title, ~tags, ~text) => {
+    meta: {
+      title,
+      tags,
+    },
+    text,
+  };
 
-let text = note => note.text;
+let text: t => string = note => note.text;
 
-let hasTag = (tag, note) => List.mem(tag, note.meta.tags);
+let hasTag: (Tag.t, t) => bool =
+  (tag, note) => List.mem(tag, note.meta.tags);

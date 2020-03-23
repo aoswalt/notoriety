@@ -1,9 +1,10 @@
 open Ops;
 
+type noteSet = Belt_Set.t(FileName.t, FileName.Comparator.identity);
 type t =
   Belt.Map.t(
     Tag.t,
-    Belt_Set.t(FileName.t, FileName.Comparator.identity),
+    noteSet,
     Tag.Comparator.identity,
   );
 type entry = (FileName.t, Tag.t);
@@ -14,14 +15,17 @@ module NameSet = {
   let make = () => Belt.Set.make(~id=(module FileName.Comparator));
 };
 
-let tagNote: (entry, t) => t = ((name, tag), db) =>
-  Belt.Map.update(
-    db,
-    tag,
-    fun
-    | Some(set) => set |> Belt.Set.add(_, name) |> (s => Some(s))
-    | None => NameSet.make() |> Belt.Set.add(_, name) |> (s => Some(s)),
-  );
+let get: (Tag.t, t) => option(noteSet) = flip(Belt.Map.get);
+
+let tagNote: (entry, t) => t =
+  ((name, tag), db) =>
+    Belt.Map.update(
+      db,
+      tag,
+      fun
+      | Some(set) => set |> Belt.Set.add(_, name) |> (s => Some(s))
+      | None => NameSet.make() |> Belt.Set.add(_, name) |> (s => Some(s)),
+    );
 
 let make: list(entry) => t =
   Belt.List.reduce(
@@ -30,24 +34,22 @@ let make: list(entry) => t =
     flip(tagNote),
   );
 
-let untagNote = ((name, tag), db) =>
-  Belt.Map.update(
-    db,
-    name,
-    fun
-    | Some(set) => set |> Belt.Set.remove(_, tag) |> (s => Some(s))
-    | None => Some(NameSet.make()),
-  );
+let untagNote: (entry, t) => t =
+  ((name, tag), db) =>
+    Belt.Map.update(
+      db,
+      name,
+      fun
+      | Some(set) => set |> Belt.Set.remove(_, tag) |> (s => Some(s))
+      | None => Some(NameSet.make()),
+    );
 
-let hasTag = (name, tag, _db) =>
-  Belt.Map.get(name)
-  >> (
-    fun
-    | Some(set) => Belt.Set.has(set, tag)
-    | None => false
-  );
-
-let notesWithTag = tag =>
-  Belt.Map.toList
-  >> Belt.List.keep(_, ((_k, v)) => Belt.Set.has(v, tag))
-  >> Belt.List.map(_, ((k, _v)) => k);
+let hasTag: (FileName.t, Tag.t, t) => bool =
+  (name, tag, db) =>
+    db
+    |> Belt.Map.get(_, name)
+    |> (
+      fun
+      | Some(set) => Belt.Set.has(set, tag)
+      | None => false
+    );
