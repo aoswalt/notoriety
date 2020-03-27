@@ -7,7 +7,6 @@ type t =
     noteSet,
     Tag.Comparator.identity,
   );
-type entry = (FileName.t, Tag.t);
 
 module NameSet = {
   type t = Belt_Set.t(FileName.t, FileName.Comparator.identity);
@@ -17,8 +16,8 @@ module NameSet = {
 
 let get: (Tag.t, t) => option(noteSet) = flip(Belt.Map.get);
 
-let tagNote: (entry, t) => t =
-  ((name, tag), db) =>
+let tagNote: (FileName.t, Tag.t, t) => t =
+  (name, tag, db) =>
     Belt.Map.update(
       db,
       tag,
@@ -27,14 +26,17 @@ let tagNote: (entry, t) => t =
       | None => NameSet.make() |> Belt.Set.add(_, name) |> (s => Some(s)),
     );
 
-let make: list(entry) => t =
-  Belt.List.reduce(
+let make: list((FileName.t, list(Tag.t))) => t = noteTags =>
+  noteTags
+  |> List.map(((name, tags)) => List.map(t => (name, t), tags))
+  |> List.flatten
+  |> Belt.List.reduce(
     _,
     Belt.Map.make(~id=(module Tag.Comparator)),
-    flip(tagNote),
+    (db, (name, tag)) => tagNote(name, tag, db),
   );
 
-let untagNote: (entry, t) => t =
+let untagNote: ((FileName.t, Tag.t), t) => t =
   ((name, tag), db) =>
     Belt.Map.update(
       db,
