@@ -1,5 +1,3 @@
-open Ops;
-
 type noteSet = Belt_Set.t(FileName.t, FileName.Comparator.identity);
 type t =
   Belt.Map.t(
@@ -14,7 +12,7 @@ module NameSet = {
   let make = () => Belt.Set.make(~id=(module FileName.Comparator));
 };
 
-let get: (Tag.t, t) => option(noteSet) = flip(Belt.Map.get);
+let get: (Tag.t, t) => option(noteSet) = (tag, db) => Belt.Map.get(db, tag);
 
 let tagNote: (FileName.t, Tag.t, t) => t =
   (name, tag, db) =>
