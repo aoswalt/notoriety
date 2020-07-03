@@ -14,9 +14,9 @@ module Internal = {
 
   let hasFrontMatter = lines => {
     let startsWithDelimiter =
-      lines |> Array.of_list |> Js.Array.findIndex(isDelimiter) == 0;
+      lines->Array.of_list->Js.Array.findIndex(isDelimiter, _) == 0;
 
-    let atLeast2 = lines |> List.filter(isDelimiter) |> List.length >= 2;
+    let atLeast2 = lines->Belt.List.keep(isDelimiter)->List.length >= 2;
 
     startsWithDelimiter && atLeast2;
   };
@@ -26,7 +26,7 @@ module Internal = {
     | lines when !hasFrontMatter(lines) => (None, lines)
     | [first, ...lines] when first == delimiter => {
         let secondIndex =
-          lines |> Array.of_list |> Js.Array.indexOf(delimiter);
+          lines->Array.of_list->Js.Array.indexOf(delimiter, _);
 
         switch (Belt.List.splitAt(lines, secondIndex)) {
         | Some((fm, [_, ...contents])) => (Some(fm), contents)
@@ -47,18 +47,18 @@ module Internal = {
     fun
     | `Object(pairs) =>
       pairs
-      |> List.find_opt(((k, _v)) => k == "tags")
-      |> (
-        fun
-        | Some((_, tags)) => tags
-        | None => `Null
-      )
+      ->Belt.List.getBy(((k, _v)) => k == "tags")
+      ->(
+          fun
+          | Some((_, tags)) => tags
+          | None => `Null
+        )
     | _ => `Null;
 
   let toTagList =
     fun
     | `Array(tags) =>
-      tags |> List.map(toString) |> List.filter(keepNonEmpty)
+      tags->Belt.List.map(toString)->Belt.List.keep(keepNonEmpty)
     | `String(tag) => [tag]
     | _ => [];
 
@@ -68,16 +68,16 @@ module Internal = {
       | None => []
       | Some(fm) =>
         fm
-        |> Array.of_list
-        |> Js.Array.joinWith("\n")
-        |> Yaml.parse
-        |> getTags
-        |> toTagList
+        ->Array.of_list
+        ->Js.Array.joinWith("\n", _)
+        ->Yaml.parse
+        ->getTags
+        ->toTagList
       };
 
     {
-      body: lines |> Array.of_list |> Js.Array.joinWith("\n"),
-      title: lines |> Belt.List.head |> Belt.Option.getWithDefault(_, ""),
+      body: lines->Array.of_list->Js.Array.joinWith("\n", _),
+      title: lines->Belt.List.head->Belt.Option.getWithDefault(""),
       tags,
     };
   };

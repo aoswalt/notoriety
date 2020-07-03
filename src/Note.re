@@ -18,5 +18,5 @@ let make: (~title: string, ~tags: list(Tag.t), ~text: string) => t =
 
 let text: t => string = note => note.text;
 
-let hasTag: (Tag.t, t) => bool =
-  (tag, note) => List.mem(tag, note.meta.tags);
+let hasTag: (t, Tag.t) => bool =
+  (note, tag) => List.mem(tag, note.meta.tags);
