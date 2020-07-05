@@ -8,7 +8,9 @@ defmodule Notoriety.TagDb do
 
   defstruct db: %{}
 
-  def new(), do: %__MODULE__{}
+  def new(files \\ []) do
+    Enum.reduce(files, %__MODULE__{}, &insert(&2, &1))
+  end
 
   def insert(%__MODULE__{} = db, %NoteFile{} = file) do
     file_name = NoteFile.file_name(file)
@@ -18,6 +20,8 @@ defmodule Notoriety.TagDb do
     |> Note.tags()
     |> Enum.reduce(db, &tag_note(&2, file_name, &1))
   end
+
+  def all(%__MODULE__{} = db), do: db.db
 
   def get(%__MODULE__{} = db, tag) do
     Map.get(db.db, tag, [])

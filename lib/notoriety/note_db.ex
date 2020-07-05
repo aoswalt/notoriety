@@ -7,7 +7,9 @@ defmodule Notoriety.NoteDb do
 
   defstruct db: %{}
 
-  def new(), do: %__MODULE__{}
+  def new(files \\ []) do
+    Enum.reduce(files, %__MODULE__{}, &put(&2, &1))
+  end
 
   def put(%__MODULE__{} = db, %NoteFile{} = file) do
     file_name = NoteFile.file_name(file)
