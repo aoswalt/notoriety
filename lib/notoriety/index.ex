@@ -3,27 +3,34 @@ defmodule Notoriety.Index do
   alias Notoriety.NoteDb
   alias Notoriety.TagDb
 
+  require EEx
+
   def generate(%TagDb{} = tag_db, %NoteDb{} = note_db) do
     tag_db
-    |> TagDb.all()
-    |> Enum.map(&create_section(&1, note_db))
-    |> Enum.join("\n")
+    |> build_tags(note_db)
+    |> generate_index()
+    |> generate_index_file()
   end
 
-  defp create_section({tag, file_names}, note_db) do
+  def build_tags(tag_db, note_db) do
+    tag_db
+    |> TagDb.all()
+    |> Map.new(&get_link_data(&1, note_db))
+  end
+
+  defp get_link_data({tag, file_names}, note_db) do
     links =
       file_names
       |> Enum.map(fn name ->
-        note = NoteDb.get(note_db, name)
-        create_link(name, note)
+        title = note_db |> NoteDb.get(name) |> Note.title()
+
+        %{title: title, path: name}
       end)
-      |> Enum.map(&"  * #{&1}")
-      |> Enum.join("\n")
 
-    "* #{tag}\n" <> links
+    {tag, links}
   end
 
-  defp create_link(file_name, %Note{} = note) do
-    "[#{Note.title(note)}](#{file_name})"
-  end
+  EEx.function_from_file(:def, :generate_index, "lib/index.md.eex", [:tags], trim: true)
+
+  EEx.function_from_file(:def, :generate_index_file, "lib/index_file.md.eex", [:index], trim: true)
 end

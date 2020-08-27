@@ -1,0 +1,4 @@
+<%= for {tag, notes} <- tags do %>
+* <%= tag %><%= for %{title: title, path: path} <- notes do %>
+  * <%= "[#{title}](#{path})" %><% end %>
+<% end %>
