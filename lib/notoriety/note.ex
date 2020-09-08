@@ -26,7 +26,7 @@ defmodule Notoriety.Note do
   defp get_title(text) do
     fn ->
       text
-      |> String.split("\n")
+      |> String.split("\n", trim: true)
       |> List.first()
       |> String.replace(~r/#+\s+/, "")
     end
