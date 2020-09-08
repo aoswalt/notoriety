@@ -8,7 +8,7 @@ defmodule Notoriety.Index do
   def generate(%TagDb{} = tag_db, %NoteDb{} = note_db) do
     tag_db
     |> build_tags(note_db)
-    |> generate_index()
+    |> index_or_message()
     |> generate_index_file()
   end
 
@@ -30,6 +30,9 @@ defmodule Notoriety.Index do
 
     {tag, links}
   end
+
+  defp index_or_message(data) when map_size(data) == 0, do: "No tagged notes found\n"
+  defp index_or_message(data), do: generate_index(data)
 
   EEx.function_from_file(:def, :generate_index, "lib/index.md.eex", [:tags], trim: true)
 
