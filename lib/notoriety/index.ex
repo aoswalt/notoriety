@@ -26,6 +26,7 @@ defmodule Notoriety.Index do
 
         %{title: title, path: name}
       end)
+      |> Enum.sort_by(& &1.title)
 
     {tag, links}
   end
