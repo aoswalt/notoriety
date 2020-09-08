@@ -14,7 +14,9 @@ defmodule Notoriety do
     tag_db = TagDb.new(files)
     note_db = NoteDb.new(files)
 
-    Index.generate(tag_db, note_db)
+    tag_db
+    |> Index.generate(note_db)
+    |> source().save_index()
   end
 
   defp source() do
