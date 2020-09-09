@@ -2,7 +2,7 @@ defmodule Notoriety.Source.InMemory do
   @behaviour Notoriety.Source
 
   @impl Notoriety.Source
-  def list_files() do
+  def list_files(_) do
     bare = """
     # Bare
 

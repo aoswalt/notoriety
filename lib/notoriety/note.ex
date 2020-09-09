@@ -39,4 +39,16 @@ defmodule Notoriety.Note do
   def tags(%__MODULE__{meta: meta}), do: meta.tags
 
   def has_tag?(%__MODULE__{meta: meta}, tag), do: Enum.member?(meta.tags, tag)
+
+  def parse(raw) do
+    case YamlFrontMatter.parse(raw) do
+      {:ok, front_matter, body} ->
+        tags = Map.get(front_matter, "tags", []) |> List.wrap()
+        new(text: body, tags: tags)
+
+      # TODO(adam): consider checking for attempted front matter
+      {:error, :invalid_front_matter} ->
+        new(text: raw)
+    end
+  end
 end

@@ -1,6 +1,6 @@
 defmodule Notoriety.NoteDb do
   @moduledoc """
-  A collection of file names to their files
+  A collection of files stored by file names
   """
 
   alias Notoriety.NoteFile

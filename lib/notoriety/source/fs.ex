@@ -1,7 +1,7 @@
 defmodule Notoriety.Source.FS do
   @behaviour Notoriety.Source
 
-  def list_files(pattern \\ "notes/**/*.md") do
+  def list_files(pattern) do
     pattern
     |> Path.wildcard()
     |> Enum.map(&{&1, File.read!(&1)})
