@@ -27,6 +27,7 @@ defmodule Notoriety.MixProject do
   defp deps() do
     [
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:jason, "~> 1.2"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:yaml_front_matter, "~> 1.0.0"}
     ]

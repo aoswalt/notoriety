@@ -6,12 +6,13 @@ defmodule Notoriety do
   alias Notoriety.TagDb
 
   def generate_index(opts \\ []) do
-    path = Keyword.get(opts, :path, Application.get_env(:notoriety, :input_path))
+    input_path = Keyword.fetch!(opts, :input_path)
     list_files = Keyword.get(opts, :list_files, &source().list_files/1)
-    save_index = Keyword.get(opts, :save_index, &source().save_index/1)
+    save_index = Keyword.get(opts, :save_index, &source().save_index/2)
+    output_file = Keyword.fetch!(opts, :output_file)
 
     files =
-      path
+      input_path
       |> list_files.()
       |> Enum.map(&parse/1)
 
@@ -20,7 +21,7 @@ defmodule Notoriety do
 
     tag_db
     |> Index.generate(note_db)
-    |> save_index.()
+    |> save_index.(output_file)
   end
 
   defp source() do
