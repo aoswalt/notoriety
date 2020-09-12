@@ -6,7 +6,7 @@ defmodule Notoriety do
   alias Notoriety.TagDb
 
   def generate_index(opts \\ []) do
-    path = Keyword.get(opts, :path, "notes/**/*.md")
+    path = Keyword.get(opts, :path, Application.get_env(:notoriety, :input_path))
     list_files = Keyword.get(opts, :list_files, &source().list_files/1)
     save_index = Keyword.get(opts, :save_index, &source().save_index/1)
 

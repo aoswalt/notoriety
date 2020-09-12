@@ -7,7 +7,7 @@ defmodule Notoriety.Source.FS do
     |> Enum.map(&{&1, File.read!(&1)})
   end
 
-  def save_index(index, filename \\ "index.md") do
+  def save_index(index, filename \\ Application.get_env(:notoriety, :output_path)) do
     File.write(filename, index)
   end
 end
