@@ -1,4 +1,9 @@
 defmodule Notoriety.Source.InMemory do
+  @moduledoc """
+  A listing of a sample set of sample note files and a simple identity funciton
+  for saving.
+  """
+
   @behaviour Notoriety.Source
 
   @impl Notoriety.Source

@@ -1,10 +1,18 @@
 defmodule Notoriety.Index do
+  @moduledoc """
+  Generation of an markdown index of tags to note links
+  """
+
   alias Notoriety.Note
   alias Notoriety.NoteDb
   alias Notoriety.TagDb
 
   require EEx
 
+  # TODO(adam): what about this taking a simple list of the files instead?
+  @doc """
+  Produce a markdown index from a `Notoriety.TagDb` and `Notoriety.NoteDb`
+  """
   def generate(%TagDb{} = tag_db, %NoteDb{} = note_db) do
     tag_db
     |> build_tags(note_db)
@@ -12,6 +20,7 @@ defmodule Notoriety.Index do
     |> generate_index_file()
   end
 
+  @doc false
   def build_tags(tag_db, note_db) do
     tag_db
     |> TagDb.all()

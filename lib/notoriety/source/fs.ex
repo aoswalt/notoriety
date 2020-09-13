@@ -1,4 +1,8 @@
 defmodule Notoriety.Source.FS do
+  @moduledoc """
+  Use the file system as a `Notoriety.Source`.
+  """
+
   @behaviour Notoriety.Source
 
   def list_files(pattern) do
