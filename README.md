@@ -4,7 +4,7 @@ Simple note management with markdown and tags.
 
 ---
 
-Primary usage is through building the escript. Alternately, runnable docker image may be built but generally requires more arguments when running.
+Primary usage is through an escript or docker image.
 
 ## Building the Escript
 
@@ -20,10 +20,8 @@ By default, running the script finds all files matched by the pattern `notes/**/
 
 For more information and overriding the defaults, see the [CLI module](lib/notoriety/cli.ex).
 
-## Building the Docker Image
+## Docker Image
 
-The docker image may be built with `docker build --tag notoriety .`.
+The [docker image](https://hub.docker.com/r/aoswalt/notoriety) expects the working directory to be mounted to `/pwd`, and because of docker, the resulting file will be created with root permission unless the `--user` flag is given.
 
-It expects the working directory to be mounted to `/pwd`, and because of docker, the resulting file will be created with root permission unless the `--user` flag is given.
-
-In summary, it can be run  with `docker run --volume $(pwd):/pwd --user $(id -u):$(id -g) notoriety`
+In summary, it can be run  with `docker run --volume $(pwd):/pwd --user $(id -u):$(id -g) aoswalt/notoriety`
