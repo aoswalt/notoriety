@@ -8,7 +8,7 @@ Primary usage is through building the escript. Alternately, runnable docker imag
 
 ## Building the Escript
 
-The escript may be built and installed with `MIX_ENV=prod mix do escript.build, escript.install`.
+The escript may be built and installed directly from the repo with `mix escript.install github aoswalt/notoriety` or locally with `MIX_ENV=prod mix do escript.build, escript.install`.
 
 If you are using [asdf](https://asdf-vm.com) to manage your elixir version, run `asdf reshim elixir` to create shims for the new escript.
 
