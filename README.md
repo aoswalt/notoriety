@@ -4,7 +4,7 @@ Simple note management with markdown and tags.
 
 ---
 
-Primary usage is through building the escript.
+Primary usage is through building the escript. Alternately, runnable docker image may be built but generally requires more arguments when running.
 
 ## Building the Escript
 
@@ -19,3 +19,11 @@ If your elixir is globally installed, make sure `~/.mix/escripts` is on your `PA
 By default, running the script finds all files matched by the pattern `notes/**/*.md`, builds an index of tags to their notes, and saves an index to `index.md`.
 
 For more information and overriding the defaults, see the [CLI module](lib/notoriety/cli.ex).
+
+## Building the Docker Image
+
+The docker image may be built with `docker build --tag notoriety .`.
+
+It expects the working directory to be mounted to `/pwd`, and because of docker, the resulting file will be created with root permission unless the `--user` flag is given.
+
+In summary, it can be run  with `docker run --volume $(pwd):/pwd --user $(id -u):$(id -g) notoriety`
