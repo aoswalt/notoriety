@@ -1,4 +1,27 @@
 defmodule Notoriety.CLI do
+  @defaults [
+    config_file: "notoriety.json",
+    input_path: "notes/**/*.md",
+    output_file: "index.md"
+  ]
+
+  @env_to_opts %{
+    "NOTO_CONFIG_FILE" => :config_file,
+    "NOTO_INPUT_PATH" => :input_path,
+    "NOTO_OUTPUT_FILE" => :output_file
+  }
+
+  @args_to_opts %{
+    "--config-file" => :config_file,
+    "--input-path" => :input_path,
+    "--output-file" => :output_file
+  }
+
+  @json_to_opts %{
+    "input_path" => :input_path,
+    "output_file" => :output_file
+  }
+
   @moduledoc """
   Read any given options and call `Notoriety.generate_index/1` with the final
   options.
@@ -6,36 +29,28 @@ defmodule Notoriety.CLI do
   ## Defaults
 
   The default options:
-    * `:config_file` - `"notoriety.json"`
-    * `:input_path` - `"notes/**/*.md"`
-    * `:output_file` - `"index.md"`
+  #{for {k, v} <- @defaults, into: "", do: ~s/* `#{k}` - `"#{v}"`\n/}
 
   ## Environment Variables
 
   The default options may be overridden through environment variables.
 
   Allowed variables to their options:
-    * `NOTO_CONFIG_FILE` - `:config_file`
-    * `NOTO_INPUT_PATH` - `:input_path`
-    * `NOTO_OUTPUT_FILE` - `:output_file`
+  #{for {k, v} <- @env_to_opts, into: "", do: ~s/* `#{k}` - `#{v}`\n/}
 
   ## Arguments
 
   Options may be given directly as arguments.
 
   Arguments to their options:
-    * `--config-file` - `:config_file`
-    * `--input-path` - `:input_path`
-    * `--output-file` - `:output_file`
+  #{for {k, v} <- @args_to_opts, into: "", do: ~s/* `#{k}` - `#{v}`\n/}
 
   ## Configuration
 
   The input and output options may be defined in a configuration json file.
 
   Keys to their options:
-    * `"config_file"` - `:config_file`
-    * `"input_path"` - `:input_path`
-    * `"output_file"` - `:output_file`
+  #{for {k, v} <- @json_to_opts, into: "", do: ~s/* `"#{k}"` - `#{v}`\n/}
 
   ## Precedence
 
@@ -49,7 +64,7 @@ defmodule Notoriety.CLI do
   final set of options.
   """
   def main(args \\ []) do
-    opts = Keyword.merge(defaults(), env())
+    opts = Keyword.merge(@defaults, env())
     arg_opts = parse_args(args)
 
     config_file_path = Keyword.get(arg_opts, :config_file) || Keyword.get(opts, :config_file)
@@ -66,20 +81,9 @@ defmodule Notoriety.CLI do
     IO.puts("Generated #{output_file}")
   end
 
-  defp defaults() do
-    [
-      config_file: "notoriety.json",
-      input_path: "notes/**/*.md",
-      output_file: "index.md"
-    ]
-  end
-
   defp env() do
-    [
-      config_file: System.get_env("NOTO_CONFIG_FILE"),
-      input_path: System.get_env("NOTO_INPUT_PATH"),
-      output_file: System.get_env("NOTO_OUTPUT_FILE")
-    ]
+    @env_to_opts
+    |> Enum.map(fn {var, opt} -> {opt, System.get_env(var)} end)
     |> reject_nils()
   end
 
@@ -90,17 +94,15 @@ defmodule Notoriety.CLI do
         {:error, :enoent} -> %{}
       end
 
-    [
-      input_path: json["input_path"],
-      output_file: json["output_file"]
-    ]
+    @json_to_opts
+    |> Enum.map(fn {key, opt} -> {opt, json[key]} end)
     |> reject_nils()
   end
 
   defp parse_args(args) do
     {opts, _args, _invalid} =
       OptionParser.parse(args,
-        strict: [config_file: :string, input_path: :string, output_file: :string]
+        strict: Enum.map(@defaults, fn {k, _} -> {k, :string} end)
       )
 
     opts
