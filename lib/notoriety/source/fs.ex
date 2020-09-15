@@ -12,6 +12,8 @@ defmodule Notoriety.Source.FS do
   end
 
   def save_index(index, file_name) do
-    File.write(file_name, index)
+    with :ok <- File.write(file_name, index) do
+      {:ok, file_name, index}
+    end
   end
 end

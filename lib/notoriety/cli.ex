@@ -75,10 +75,8 @@ defmodule Notoriety.CLI do
       |> Keyword.merge(config_opts)
       |> Keyword.merge(arg_opts)
 
-    output_file = Keyword.fetch!(full_opts, :output_file)
-
-    Notoriety.generate_index(full_opts)
-    IO.puts("Generated #{output_file}")
+    {:ok, file_name, _content} = Notoriety.generate_index(full_opts)
+    IO.puts("Generated #{file_name}")
   end
 
   defp env() do

@@ -12,5 +12,5 @@ defmodule Notoriety.Source do
   Save the resulting index to the given file.
   """
   @callback save_index(index :: String.t(), file_name :: String.t()) ::
-              {:ok, term} | {:error, reason :: term}
+              {:ok, file_name :: String.t(), contents :: String.t()} | {:error, reason :: term}
 end

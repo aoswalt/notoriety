@@ -72,5 +72,5 @@ defmodule Notoriety.Source.InMemory do
   end
 
   @impl Notoriety.Source
-  def save_index(index, _file_name), do: {:ok, index}
+  def save_index(index, file_name), do: {:ok, file_name, index}
 end

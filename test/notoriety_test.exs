@@ -18,14 +18,13 @@ defmodule NotorietyTest do
     test "uses the given output_file" do
       file_arg = "this file"
 
-      save_index = fn _file, path ->
-        send(self(), {:output_file, path})
-        []
-      end
+      {:ok, file_name, _contents} =
+        Notoriety.generate_index(
+          input_path: "path",
+          output_file: file_arg
+        )
 
-      Notoriety.generate_index(input_path: "path", save_index: save_index, output_file: file_arg)
-
-      assert_receive {:output_file, file_arg}
+      assert file_name == file_arg
     end
 
     test "includes tagged files in resulting index" do
@@ -36,18 +35,16 @@ defmodule NotorietyTest do
 
       list_files = fn _ -> files end
 
-      save_index = fn index, _path ->
-        assert index =~ tag
-        assert index =~ file_name
-        assert index =~ title
-      end
+      {:ok, _file_name, index} =
+        Notoriety.generate_index(
+          input_path: "path",
+          list_files: list_files,
+          output_file: "file"
+        )
 
-      Notoriety.generate_index(
-        input_path: "path",
-        list_files: list_files,
-        save_index: save_index,
-        output_file: "file"
-      )
+      assert index =~ tag
+      assert index =~ file_name
+      assert index =~ title
     end
   end
 end
