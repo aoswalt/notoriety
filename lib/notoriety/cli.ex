@@ -98,8 +98,8 @@ defmodule Notoriety.CLI do
   end
 
   defp parse_args(args) do
-    {opts, _args, _invalid} =
-      OptionParser.parse(args,
+    {opts, _args} =
+      OptionParser.parse!(args,
         strict: Enum.map(@defaults, fn {k, _} -> {k, :string} end)
       )
 
