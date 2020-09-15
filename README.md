@@ -1,12 +1,12 @@
 # Notoriety
 
-Simple note management with markdown and tags.
+Notoriously note management with markdown and tags.
 
 ---
 
 Primary usage is through an escript or docker image.
 
-## Building the Escript
+## Installing the Escript
 
 The escript may be built and installed directly from the repo with `mix escript.install github aoswalt/notoriety` or locally with `MIX_ENV=prod mix do escript.build, escript.install`.
 
