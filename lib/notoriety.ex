@@ -20,12 +20,14 @@ defmodule Notoriety do
     * `:output_file` (required) - the path to save the resulting index
     * `:list_files` - override the `list_files/2` function from the configured `Notoriety.Source`
     * `:save_index` - override the `save_index/2` function from the configured `Notoriety.Source`
+    * `:template_file` - a path to an eex file to use instead of the default template
   """
   def generate_index(opts) do
     input_path = Keyword.fetch!(opts, :input_path)
     list_files = Keyword.get(opts, :list_files, &source().list_files/1)
     save_index = Keyword.get(opts, :save_index, &source().save_index/2)
     output_file = Keyword.fetch!(opts, :output_file)
+    template_file = Keyword.get(opts, :template_file, :default)
 
     files =
       input_path
@@ -36,7 +38,7 @@ defmodule Notoriety do
     note_db = NoteDb.new(files)
 
     tag_db
-    |> Index.generate(note_db)
+    |> Index.generate(note_db, template_file)
     |> save_index.(output_file)
   end
 

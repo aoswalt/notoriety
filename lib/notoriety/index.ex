@@ -13,11 +13,11 @@ defmodule Notoriety.Index do
   @doc """
   Produce a markdown index from a `Notoriety.TagDb` and `Notoriety.NoteDb`
   """
-  def generate(%TagDb{} = tag_db, %NoteDb{} = note_db) do
+  def generate(%TagDb{} = tag_db, %NoteDb{} = note_db, template_file_path) do
     tag_db
     |> build_tags(note_db)
     |> index_or_message()
-    |> generate_index_file()
+    |> generate_index_file(template_file_path)
   end
 
   @doc false
@@ -45,5 +45,10 @@ defmodule Notoriety.Index do
 
   EEx.function_from_file(:def, :generate_index, "lib/index.md.eex", [:tags], trim: true)
 
-  EEx.function_from_file(:def, :generate_index_file, "lib/index_file.md.eex", [:index], trim: true)
+  defp generate_index_file(index, :default), do: generate_default_index_file(index: index)
+  defp generate_index_file(index, template_file_path) do
+    EEx.eval_file(template_file_path, assigns: [index: index])
+  end
+
+  EEx.function_from_file(:def, :generate_default_index_file, "lib/index_file.md.eex", [:assigns], trim: true)
 end

@@ -1,6 +1,6 @@
 # Notoriety
 
-Notoriously note management with markdown and tags.
+Notoriously simple note management with markdown and tags.
 
 ---
 

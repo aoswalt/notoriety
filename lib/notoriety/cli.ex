@@ -2,24 +2,28 @@ defmodule Notoriety.CLI do
   @defaults [
     config_file: "notoriety.json",
     input_path: "notes/**/*.md",
-    output_file: "index.md"
+    output_file: "index.md",
+    template_file: :default
   ]
 
   @env_to_opts %{
     "NOTO_CONFIG_FILE" => :config_file,
     "NOTO_INPUT_PATH" => :input_path,
-    "NOTO_OUTPUT_FILE" => :output_file
+    "NOTO_OUTPUT_FILE" => :output_file,
+    "NOTO_TEMPLATE_FILE" => :template_file
   }
 
   @args_to_opts %{
     "--config-file" => :config_file,
     "--input-path" => :input_path,
-    "--output-file" => :output_file
+    "--output-file" => :output_file,
+    "--template-file" => :template_file
   }
 
   @json_to_opts %{
     "input_path" => :input_path,
-    "output_file" => :output_file
+    "output_file" => :output_file,
+    "template_file" => :template_file
   }
 
   @moduledoc """

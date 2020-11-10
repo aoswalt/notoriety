@@ -12,7 +12,7 @@ defmodule NotorietyTest do
 
       Notoriety.generate_index(input_path: path_arg, list_files: list_files, output_file: "file")
 
-      assert_receive {:input_path, path_arg}
+      assert_receive {:input_path, _path_arg}
     end
 
     test "uses the given output_file" do
@@ -41,6 +41,29 @@ defmodule NotorietyTest do
           list_files: list_files,
           output_file: "file"
         )
+
+      assert index =~ tag
+      assert index =~ file_name
+      assert index =~ title
+    end
+
+    test "uses a different template" do
+      file_name = "file1"
+      tag = "abc"
+      title = "File Title"
+      files = [{file_name, "---\ntags: [#{tag}]\n---\n\n# #{title}\n\nsome content"}]
+
+      list_files = fn _ -> files end
+
+      {:ok, _file_name, index} =
+        Notoriety.generate_index(
+          input_path: "path",
+          list_files: list_files,
+          output_file: "file",
+          template_file: "test/support/test_index_template.md.eex"
+        )
+
+      assert index =~ "Test Template"
 
       assert index =~ tag
       assert index =~ file_name

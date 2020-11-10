@@ -10,7 +10,7 @@ defmodule Notoriety.IndexTest do
   setup [:sample_data]
 
   test "generating an index has the expected notes", ctx do
-    index = Index.generate(ctx.tag_db, ctx.note_db)
+    index = Index.generate(ctx.tag_db, ctx.note_db, :default)
 
     refute index =~ Note.title(ctx.note1)
     assert ctx.note2 |> Note.title() |> Regex.compile!() |> Regex.scan(index) |> length() == 1
@@ -23,6 +23,17 @@ defmodule Notoriety.IndexTest do
 
     assert mapping["abc"] |> length() == 2
     assert mapping["def"] |> length() == 1
+  end
+
+  test "using a different template", ctx do
+    index = Index.generate(ctx.tag_db, ctx.note_db, "test/support/test_index_template.md.eex")
+
+    assert index =~ "Test Template"
+
+    refute index =~ Note.title(ctx.note1)
+    assert ctx.note2 |> Note.title() |> Regex.compile!() |> Regex.scan(index) |> length() == 1
+    assert ctx.note3 |> Note.title() |> Regex.compile!() |> Regex.scan(index) |> length() == 2
+    refute index =~ Note.title(ctx.note4)
   end
 
   defp sample_data(_) do
