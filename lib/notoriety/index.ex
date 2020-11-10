@@ -47,7 +47,7 @@ defmodule Notoriety.Index do
 
   defp generate_index_file(index, :default), do: generate_default_index_file(index: index)
   defp generate_index_file(index, template_file_path) do
-    EEx.eval_file(template_file_path, assigns: [index: index])
+    EEx.eval_file(template_file_path, [assigns: [index: index]], trim: true)
   end
 
   EEx.function_from_file(:def, :generate_default_index_file, "lib/index_file.md.eex", [:assigns], trim: true)
