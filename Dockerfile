@@ -1,4 +1,9 @@
-FROM elixir:1.10.4-alpine AS builder
+ARG ELIXIR_VER=1.11.3
+ARG OTP_VER=23.2.7
+ARG OS=alpine-3.13.2
+# ARG OS=focal-20210119
+
+FROM hexpm/elixir:${ELIXIR_VER}-erlang-${OTP_VER}-${OS} AS builder
 
 ENV MIX_ENV=prod
 
@@ -12,7 +17,7 @@ COPY . .
 
 RUN mix do deps.get, deps.compile, compile, escript.build
 
-FROM erlang:22-alpine AS app
+FROM hexpm/erlang:${OTP_VER}-${OS} AS app
 
 COPY --from=builder /app/notoriety /usr/local/bin
 
