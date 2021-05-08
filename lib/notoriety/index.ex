@@ -14,16 +14,23 @@ defmodule Notoriety.Index do
   Produce a markdown index from a `Notoriety.TagDb` and `Notoriety.NoteDb`
   """
   def generate(%TagDb{} = tag_db, %NoteDb{} = note_db, template_file_path) do
-    tag_db
-    |> build_tags(note_db)
-    |> index_or_message()
-    |> generate_index_file(template_file_path)
+    index =
+      tag_db
+      |> build_tags(note_db)
+      |> index_or_message()
+
+    untagged =
+      tag_db
+      |> build_tags(note_db, untagged: :only)
+      |> generate_index()
+
+    generate_index_file(index, untagged, template_file_path)
   end
 
   @doc false
-  def build_tags(tag_db, note_db) do
+  def build_tags(tag_db, note_db, opts \\ []) do
     tag_db
-    |> TagDb.all()
+    |> TagDb.all(opts)
     |> Map.new(&get_link_data(&1, note_db))
   end
 
@@ -45,10 +52,14 @@ defmodule Notoriety.Index do
 
   EEx.function_from_file(:def, :generate_index, "lib/index.md.eex", [:tags], trim: true)
 
-  defp generate_index_file(index, :default), do: generate_default_index_file(index: index)
-  defp generate_index_file(index, template_file_path) do
-    EEx.eval_file(template_file_path, [assigns: [index: index]], trim: true)
+  defp generate_index_file(index, untagged, :default),
+    do: generate_default_index_file(index: index, untagged: untagged)
+
+  defp generate_index_file(index, untagged, template_file_path) do
+    EEx.eval_file(template_file_path, [assigns: [index: index, untagged: untagged]], trim: true)
   end
 
-  EEx.function_from_file(:def, :generate_default_index_file, "lib/index_file.md.eex", [:assigns], trim: true)
+  EEx.function_from_file(:def, :generate_default_index_file, "lib/index_file.md.eex", [:assigns],
+    trim: true
+  )
 end

@@ -12,9 +12,11 @@ defmodule Notoriety.IndexTest do
   test "generating an index has the expected notes", ctx do
     index = Index.generate(ctx.tag_db, ctx.note_db, :default)
 
-    refute index =~ Note.title(ctx.note1)
+    assert index =~ Note.title(ctx.note1)
     assert ctx.note2 |> Note.title() |> Regex.compile!() |> Regex.scan(index) |> length() == 1
     assert ctx.note3 |> Note.title() |> Regex.compile!() |> Regex.scan(index) |> length() == 2
+
+    # NOTE(adam): not included in dbs
     refute index =~ Note.title(ctx.note4)
   end
 

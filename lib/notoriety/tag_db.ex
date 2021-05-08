@@ -26,13 +26,28 @@ defmodule Notoriety.TagDb do
     file
     |> NoteFile.note()
     |> Note.tags()
+    |> case do
+      [] -> [:untagged]
+      tags -> tags
+    end
     |> Enum.reduce(db, &tag_note(&2, file_name, &1))
   end
 
   @doc """
   Return all stored tags to file names from the `TagDb`.
+
+  Options:
+  * `:untagged` - whether to include untagged notes
+      * `:include` - include untagged notes
+      * `:only` - only return untagged notes
   """
-  def all(%__MODULE__{} = db), do: db.db
+  def all(%__MODULE__{} = db, opts \\ []) do
+    case Keyword.get(opts, :untagged) do
+      :include -> db.db
+      :only -> Map.take(db.db, [:untagged])
+      _ -> Map.delete(db.db, :untagged)
+    end
+  end
 
   @doc """
   Get the list of file names for the given tag from the `TagDb`.
