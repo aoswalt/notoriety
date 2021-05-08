@@ -1,5 +1,6 @@
 defmodule Notoriety.CLI do
   @defaults [
+    root_dir: ".",
     config_file: "notoriety.json",
     input_path: "notes/**/*.md",
     output_file: "index.md",
@@ -7,6 +8,7 @@ defmodule Notoriety.CLI do
   ]
 
   @env_to_opts %{
+    "NOTO_ROOT_DIR" => :root_dir,
     "NOTO_CONFIG_FILE" => :config_file,
     "NOTO_INPUT_PATH" => :input_path,
     "NOTO_OUTPUT_FILE" => :output_file,
@@ -14,6 +16,7 @@ defmodule Notoriety.CLI do
   }
 
   @args_to_opts %{
+    "--root_dir" => :root_dir,
     "--config-file" => :config_file,
     "--input-path" => :input_path,
     "--output-file" => :output_file,
@@ -70,6 +73,9 @@ defmodule Notoriety.CLI do
   def main(args \\ []) do
     opts = Keyword.merge(@defaults, env())
     arg_opts = parse_args(args)
+
+    root_dir = Keyword.get(arg_opts, :root_dir) || Keyword.get(opts, :root_dir)
+    File.cd!(root_dir)
 
     config_file_path = Keyword.get(arg_opts, :config_file) || Keyword.get(opts, :config_file)
     config_opts = parse_config(config_file_path)
